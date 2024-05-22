@@ -1,3 +1,11 @@
+/*
+
+two player gui and logic
+@file double_player.java
+@author David Zhang
+@version 1.0 May 21, 2024
+
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,13 +16,6 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-
-// TODO
-// the frame won't close...
-// dispose();, revalidate();, repaint(); does NOT work
-// frame.dispose(); also does NOT work
-// So it works if i open another class, maybe set another identical class that opens instead
-// then they can ping pong the gamestate back and forth until someone loses
 
 public class double_player extends JFrame {
 
@@ -27,6 +28,7 @@ public class double_player extends JFrame {
 
     public double_player(int initialHeapSize, int curr) {
         heapSize = initialHeapSize;
+        // player turn turns to int here for easier logic
         playerTurn = curr;
 
 
@@ -40,6 +42,8 @@ public class double_player extends JFrame {
 
         // Heap label
 
+        // labels and marble initialization is identical to the one in single_player.java
+        // just here there are no instructions for cpu ( 2 humans playing each-other)
         heapLabel = new JLabel("Heap size: " + heapSize, SwingConstants.CENTER);
         heapLabel.setBounds(400, 10, 100, 100);
 

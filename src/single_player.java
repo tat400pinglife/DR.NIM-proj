@@ -1,3 +1,11 @@
+/*
+
+one player gui and logic
+@file single_player.java
+@author David Zhang
+@version 1.0 May 21, 2024
+
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,15 +26,11 @@ import javax.swing.JLabel;
         private boolean playerTurn;
         public JLabel[] labels;
 
-        public void close(){
-
-            WindowEvent winClosingEvent = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
-            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
-
-        }
 
         public single_player(int initialHeapSize) {
+            // int to track number of marbles in game
             heapSize = initialHeapSize;
+            // boolean to track whose turn it is
             playerTurn = true; // Player starts
 
 
@@ -48,11 +52,12 @@ import javax.swing.JLabel;
             endTurnButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent end) {
-                    if (counter == 0) {
+                    if (counter == 0) { // case when no marbles are dropped
                         JOptionPane.showMessageDialog(frame, "Must take atleast one marble");
                     }
                     else {
                         if (heapSize > 0) {
+                            // update game state then dispose of current frame and reboot new frame
                             removeObjectsFromHeap(counter);
                             counter = 0;
                             frame.dispose();
@@ -78,18 +83,18 @@ import javax.swing.JLabel;
                 labels[i] = label;
                 objectPanel.add(labels[i]);
 
+
                 MouseAdapter mouseAdapter = new MouseAdapter() {
-                    private Point initial;
+                    private Point initial; // point object to track x and y of mouse
 
                     public void mousePressed (MouseEvent e){
-                        initial = e.getPoint();
+                        initial = e.getPoint(); // get point when pressed
                         label.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
                     }
 
-                    // TODO
-                    // the remove makes it not interactable but the image stays???
-                    // can probably visible(false)
+
                     public void delete (Component component){
+                        // delete marble by setting it invisible and deleting from frame
                         label.setVisible(false);
                         frame.remove(component);
                     }
@@ -97,17 +102,26 @@ import javax.swing.JLabel;
                     public void mouseReleased (MouseEvent e){
                         label.setCursor(Cursor.getDefaultCursor());
                         Rectangle dropAreaBounds = new Rectangle(1000, 500, 100, 100);
+                        // using the bounds of the drop area detect if the boundaries intersect
+                        // delete the marble and increase the counter
                         if (dropAreaBounds.intersects(label.getBounds()) && counter < 3) {
                             delete(label);
                             counter++;
                             JOptionPane.showMessageDialog(frame, "Marble dropped! Counter: " + counter);
                         }
                     }
+
+                    // this is the tracker that moves the marble with the mouse
+                    // very buggy when moving the application in window
+                    // on my local end fast window movement and resizing messes up the offset
                     public void mouseDragged (MouseEvent e){
+                        // get initial location
                         int px = label.getLocation().x;
                         int py = label.getLocation().y;
+                        // get offset location
                         int x = e.getX() - initial.x;
                         int y = e.getY() - initial.y;
+                        //combining both initial and offset constantly to give effect of the marble following mouse
                         label.setLocation(x+px, y+py);
                     }
                 };
@@ -134,7 +148,7 @@ import javax.swing.JLabel;
         }
             // Remove objects from the heap
             private void removeObjectsFromHeap ( int objectsToRemove){
-                if (heapSize >= objectsToRemove) {
+                if (heapSize >= objectsToRemove) { // case check heap size doesn't go below zero
                     heapSize -= objectsToRemove;
                     updateHeapLabel();
                     checkGameStatus();
@@ -153,23 +167,25 @@ import javax.swing.JLabel;
             private void playComputerTurn () {
             int objectsToRemove;
                 if (heapSize > 0) {
-                    if ((heapSize)%5 == 0) {
+                    // basic strategy is to always keep the heap size as a multiple of 4
+                    // this gets tricky when the start size isn't predetermined
+                    if ((heapSize)%5 == 0) { // this leaves the size to a (multiple of 4) + 1
                         objectsToRemove = 1;
                     }
                     else{
                         if (4-counter < heapSize) {
                             objectsToRemove = (4 - counter);
+                            // take the remainder of 4 of what the player takes
                         }
                         else {
+                            // case here to make sure heap size doesn't go negative
                             objectsToRemove = 1;
                         }
-                        }
-
+                    }
 
                     heapSize -= objectsToRemove;
                     updateHeapLabel();
                     JOptionPane.showMessageDialog(this, "CPU removes " + objectsToRemove + " marbles from the heap");
-                    int removed = 0;
                     checkGameStatus();
                     playerTurn = true; // Computer's turn ends
                 }

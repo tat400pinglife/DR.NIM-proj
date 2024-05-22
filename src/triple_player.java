@@ -1,3 +1,11 @@
+/*
+
+three player gui and logic
+@file triple_player.java
+@author David Zhang
+@version 1.0 May 21, 2024
+
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,8 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 
-// TODO
-// make the CPU more smart
 
 public class triple_player extends JFrame {
 
@@ -21,12 +27,6 @@ public class triple_player extends JFrame {
     public JLabel[] labels;
     public boolean num_cpu;
 
-    public void close() {
-
-        WindowEvent winClosingEvent = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
-
-    }
 
     public triple_player(int initialHeapSize, boolean cpu, int curr_turn) {
         heapSize = initialHeapSize;
@@ -42,7 +42,7 @@ public class triple_player extends JFrame {
         frame.setLocationRelativeTo(null);
 
         // Heap label
-
+        // same label and marble initialization
         heapLabel = new JLabel("Heap size: " + heapSize, SwingConstants.CENTER);
         heapLabel.setBounds(400, 10, 100, 100);
 
@@ -57,7 +57,7 @@ public class triple_player extends JFrame {
                 else {
                     if (heapSize > 0) {// this means one cpu
                         removeObjectsFromHeap(counter);
-                        if (heapSize < 1){
+                        if (heapSize < 1){ // extra check for when game ends
                             frame.dispose();
                         }
                         frame.dispose();
@@ -152,7 +152,7 @@ public class triple_player extends JFrame {
                     playComputerTurn();
                 }
             }
-            else {
+            else { // if two cpu
                 if (playerTurn%3 == 2 || playerTurn%3 == 1) {
                     playComputerTurn();
                     playComputerTurn();
@@ -169,28 +169,36 @@ public class triple_player extends JFrame {
     // Update the object labels to reflect the new heap size
 
     // Perform computer's turn
+    // quick logic the cpu try to work with each other to force the player into a losing position
+    // there is some strategy and then there is chaos
+    // if heap reaches a multiple of 4 the game should be lost
     private void playComputerTurn() {
         int objectsToRemove = 0;
         if (heapSize > 0) {
             if (!num_cpu){ // man there's too many scenarios
                 if (heapSize%4 == 0) {
-                    objectsToRemove = 3;
+                    objectsToRemove = 2;
                 }
                 else {
-                    objectsToRemove = 1;
+                    objectsToRemove = Math.min(heapSize,3);
                 }
             }
             else { // too much random, head hurt :(
-                objectsToRemove = Math.min(4-counter, 1);
+                objectsToRemove = 1;
             }
 
             heapSize -= objectsToRemove;
             updateHeapLabel();
-            if (playerTurn%3 == 1) {
-                JOptionPane.showMessageDialog(this, "CPU one removes " + objectsToRemove + " marbles from the heap");
+            if (!num_cpu) { // two cpu output
+                if (playerTurn % 3 == 1) {
+                    JOptionPane.showMessageDialog(this, "CPU one removes " + objectsToRemove + " marbles from the heap");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "CPU two removes " + objectsToRemove + " marbles from the heap");
+                }
             }
-            else {
-                JOptionPane.showMessageDialog(this, "CPU two removes " + objectsToRemove + " marbles from the heap");
+            else { // one cpu
+                JOptionPane.showMessageDialog(this, "CPU removes " + objectsToRemove + " marbles from the heap");
             }
             checkGameStatus();
             playerTurn++; // Computer's turn ends
@@ -199,7 +207,7 @@ public class triple_player extends JFrame {
 
     // Check if the game is over
     private void checkGameStatus() {
-        if (num_cpu) {
+        if (num_cpu) { // one cpu
             if (heapSize == 0) {
                 if (playerTurn % 3 == 0) {
                     JOptionPane.showMessageDialog(this, "player 1 loses!");
@@ -212,7 +220,7 @@ public class triple_player extends JFrame {
                     System.exit(0);
                 }
             }
-        } else {
+        } else { // two cpu
             if (heapSize == 0) {
                 if (playerTurn % 3 == 0) {
                     JOptionPane.showMessageDialog(this, "player 1 loses!");
