@@ -56,7 +56,7 @@ public class menu_gui extends JFrame {
                 // same for all buttons
                 try {
                     int initialHeapSize = Integer.parseInt((heapSizeTextField.getText()));
-                    System.out.println(initialHeapSize);
+
                     int starting_pos = Integer.parseInt((starter.getText()));
 
                     if (!(starting_pos == 2 || starting_pos == 1)) {
@@ -66,7 +66,7 @@ public class menu_gui extends JFrame {
                         throw new Exception();
                     }
                     dispose(); // Close the menu frame
-                    System.out.println("dispose");
+
                     new single_player(initialHeapSize, starting_pos);
                 }
                 catch (Exception excpt){
