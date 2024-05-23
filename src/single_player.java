@@ -31,7 +31,7 @@ import javax.swing.JLabel;
             // int to track number of marbles in game
             heapSize = initialHeapSize;
             // boolean to track whose turn it is
-            playerTurn = starting == 1; // Player starts
+            playerTurn = (starting == 1); // Player starts
 
 
             // set up frame
@@ -106,7 +106,8 @@ import javax.swing.JLabel;
                         // delete the marble and increase the counter
                         if (!playerTurn) {
                             JOptionPane.showMessageDialog(frame, "End your turn, CPU goes first");
-                        } else {
+                        }
+                        else {
                             if (dropAreaBounds.intersects(label.getBounds()) && counter < 3) {
                                 delete(label);
                                 counter++;

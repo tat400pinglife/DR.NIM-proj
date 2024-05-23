@@ -67,7 +67,7 @@ public class menu_gui extends JFrame {
                     }
                     dispose(); // Close the menu frame
                     System.out.println("dispose");
-                    new single_player(initialHeapSize, 2);
+                    new single_player(initialHeapSize, starting_pos);
                 }
                 catch (Exception excpt){
                     JOptionPane.showMessageDialog(buttonPanel, "Enter valid start values");
