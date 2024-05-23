@@ -27,11 +27,11 @@ import javax.swing.JLabel;
         public JLabel[] labels;
 
 
-        public single_player(int initialHeapSize) {
+        public single_player(int initialHeapSize, int starting) {
             // int to track number of marbles in game
             heapSize = initialHeapSize;
             // boolean to track whose turn it is
-            playerTurn = true; // Player starts
+            playerTurn = starting == 1; // Player starts
 
 
             // set up frame
@@ -52,7 +52,7 @@ import javax.swing.JLabel;
             endTurnButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent end) {
-                    if (counter == 0) { // case when no marbles are dropped
+                    if (counter == 0 && playerTurn == true) { // case when no marbles are dropped
                         JOptionPane.showMessageDialog(frame, "Must take atleast one marble");
                     }
                     else {
@@ -61,7 +61,7 @@ import javax.swing.JLabel;
                             removeObjectsFromHeap(counter);
                             counter = 0;
                             frame.dispose();
-                            new single_player(heapSize); // Pass initial heap size or any necessary parameters
+                            new single_player(heapSize, 1); // Pass initial heap size or any necessary parameters
                         }
                     }
                 }
@@ -99,15 +99,19 @@ import javax.swing.JLabel;
                         frame.remove(component);
                     }
 
-                    public void mouseReleased (MouseEvent e){
+                    public void mouseReleased (MouseEvent e) {
                         label.setCursor(Cursor.getDefaultCursor());
                         Rectangle dropAreaBounds = new Rectangle(1000, 500, 100, 100);
                         // using the bounds of the drop area detect if the boundaries intersect
                         // delete the marble and increase the counter
-                        if (dropAreaBounds.intersects(label.getBounds()) && counter < 3) {
-                            delete(label);
-                            counter++;
-                            JOptionPane.showMessageDialog(frame, "Marble dropped! Counter: " + counter);
+                        if (!playerTurn) {
+                            JOptionPane.showMessageDialog(frame, "End your turn, CPU goes first");
+                        } else {
+                            if (dropAreaBounds.intersects(label.getBounds()) && counter < 3) {
+                                delete(label);
+                                counter++;
+                                JOptionPane.showMessageDialog(frame, "Marble dropped! Counter: " + counter);
+                            }
                         }
                     }
 
@@ -165,23 +169,37 @@ import javax.swing.JLabel;
 
             // Perform computer's turn
             private void playComputerTurn () {
-            int objectsToRemove;
+            int objectsToRemove = 0;
                 if (heapSize > 0) {
                     // basic strategy is to always keep the heap size as a multiple of 4
                     // this gets tricky when the start size isn't predetermined
-                    if ((heapSize)%5 == 0) { // this leaves the size to a (multiple of 4) + 1
+                    if ((heapSize)%4 == 1) { // losing scenario
                         objectsToRemove = 1;
                     }
-                    else{
-                        if (4-counter < heapSize) {
-                            objectsToRemove = (4 - counter);
-                            // take the remainder of 4 of what the player takes
-                        }
-                        else {
-                            // case here to make sure heap size doesn't go negative
-                            objectsToRemove = 1;
-                        }
+                    else if (heapSize % 5 == 0 ) {
+                        objectsToRemove = 1;
                     }
+                    // rest is edge casing
+                    else if (heapSize > 5 && heapSize < 9){ // leave at 5 for player
+                        objectsToRemove = heapSize-5;
+                    }
+                    else if (heapSize % 5 == 1){
+                        objectsToRemove = 2;
+                    }
+                    else if (heapSize == 2) {
+                        objectsToRemove = 1;
+                    }
+                    else if (heapSize == 3) {
+                        objectsToRemove = 2;
+                    }
+                    else if (counter == 0){
+                        objectsToRemove = 1;
+                    }
+                    else {
+                        objectsToRemove = 4-counter;
+                    }
+
+
 
                     heapSize -= objectsToRemove;
                     updateHeapLabel();

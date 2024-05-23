@@ -14,12 +14,13 @@ import java.awt.event.ActionListener;
 public class menu_gui extends JFrame {
 
     private JTextField heapSizeTextField;
+    private JTextField starter;
 
     public menu_gui() {
         // create layout
         setTitle("Dr. Nim - Menu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        setSize(500, 400);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
 
@@ -28,9 +29,16 @@ public class menu_gui extends JFrame {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add margin from the sides
 
+        JPanel start = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel start_text = new JLabel("Who goes first *single player only (1 for player , 2 for CPU):");
+        starter = new JTextField(5); // Create a text field for heap size input
+        start.add(start_text);
+        start.add(starter);
+        buttonPanel.add(start);
+
         // panel to enter amount of marbles for game
         JPanel heapSizePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel heapSizeLabel = new JLabel("Enter amount of marbles:");
+        JLabel heapSizeLabel = new JLabel("Enter amount of marbles (positive int):");
         heapSizeTextField = new JTextField(5); // Create a text field for heap size input
         heapSizePanel.add(heapSizeLabel);
         heapSizePanel.add(heapSizeTextField);
@@ -42,17 +50,27 @@ public class menu_gui extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                dispose(); // Close the menu frame
+
                 // take in input from the textbox
-                // if wrong format, output message "input an positive integer"
+                // if wrong format, output message
                 // same for all buttons
                 try {
                     int initialHeapSize = Integer.parseInt((heapSizeTextField.getText()));
-                    new single_player(initialHeapSize);
-                }
-                catch (NumberFormatException excpt){
-                    System.out.println("Input an positive integer");
+                    System.out.println(initialHeapSize);
+                    int starting_pos = Integer.parseInt((starter.getText()));
 
+                    if (!(starting_pos == 2 || starting_pos == 1)) {
+                        throw new Exception();
+                    }
+                    if ( initialHeapSize <= 0){
+                        throw new Exception();
+                    }
+                    dispose(); // Close the menu frame
+                    System.out.println("dispose");
+                    new single_player(initialHeapSize, 2);
+                }
+                catch (Exception excpt){
+                    JOptionPane.showMessageDialog(buttonPanel, "Enter valid start values");
                 }
             }
         });

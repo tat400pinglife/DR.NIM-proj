@@ -166,27 +166,39 @@ public class triple_player extends JFrame {
         heapLabel.setText("Heap size: " + heapSize);
     }
 
-    // Update the object labels to reflect the new heap size
-
     // Perform computer's turn
-    // quick logic the cpu try to work with each other to force the player into a losing position
     // there is some strategy and then there is chaos
-    // if heap reaches a multiple of 4 the game should be lost
     private void playComputerTurn() {
         int objectsToRemove = 0;
         if (heapSize > 0) {
-            if (!num_cpu){ // man there's too many scenarios
-                if (heapSize%4 == 0) {
-                    objectsToRemove = 2;
-                }
-                else {
-                    objectsToRemove = Math.min(heapSize,3);
-                }
-            }
-            else { // too much random, head hurt :(
+            // man there's too many scenarios
+            // this gets tricky when the start size isn't predetermined
+            // end result the CPU will play for themselves
+            if ((heapSize)%4 == 1) { // losing scenario
                 objectsToRemove = 1;
             }
-
+            else if (heapSize % 5 == 0 ) {
+                objectsToRemove = 1;
+            }
+            // rest is edge casing
+            else if (heapSize > 5 && heapSize < 9){ // leave at 5 for player
+                objectsToRemove = heapSize-5;
+            }
+            else if (heapSize % 5 == 1){
+                objectsToRemove = 2;
+            }
+            else if (heapSize == 2) {
+                objectsToRemove = 1;
+            }
+            else if (heapSize == 3) {
+                objectsToRemove = 2;
+            }
+            else if (counter == 0){
+                objectsToRemove = 1;
+            }
+            else {
+                objectsToRemove = 4-counter;
+            }
             heapSize -= objectsToRemove;
             updateHeapLabel();
             if (!num_cpu) { // two cpu output
